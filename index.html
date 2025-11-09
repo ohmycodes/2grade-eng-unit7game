@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misión de Exploradores</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="phase-1">
+        <h1>Misión de Exploradores</h1>
+        <h2 class="phase-title">Fase 1: Empacar la mochila de excursión</h2>
+        
+        <h2 id="instruction-text">¡Preparémonos!</h2>
+
+        <div id="game-area">
+            
+            <img src="images/backpack-target.png" id="backpack-target" alt="Backpack target" />
+
+            <img src="images/cap.png" class="item" id="cap" alt="Cap">
+            <img src="images/coat.png" class="item" id="coat" alt="Coat">
+            <img src="images/guide-book.png" class="item" id="guide-book" alt="Guide Book">
+            <img src="images/water-bottle.png" class="item" id="water-bottle" alt="Water Bottle">
+            <img src="images/map.png" class="item" id="map" alt="Map">
+            <img src="images/sun-cream.png" class="item" id="sun-cream" alt="Sun Cream">
+            <img src="images/magnifying-glass.png" class="item" id="magnifying-glass" alt="Magnifying Glass">
+            <img src="images/mobile-phone.png" class="item" id="mobile-phone" alt="mobile phone">
+            <img src="images/backpack.png" class="item" id="backpack" alt="Backpack">
+            <img src="images/notebook.png" class="item" id="notebook" alt="Notebook">
+        </div>
+    </div>
+
+    <div id="phase-2" class="hidden">
+        <h2 class="phase-title">Fase 2: Encontrar al dueño de cada objeto</h2>
+        <h2 id="phase-2-question">¡Oh no! ¡Todo se mezcló!</h2>
+
+        <div id="item-display-area">
+            </div>
+
+        <div id="answer-buttons">
+            <button class="answer-btn" id="btn-mine">It's MINE</button>
+            <button class="answer-btn" id="btn-his">It's HIS</button>
+            <button class="answer-btn" id="btn-hers">It's HERS</button>
+            <button class="answer-btn" id="btn-theirs">It's THEIRS</button>
+        </div>
+
+        <div id="yours-buttons" class="hidden">
+            <button class="answer-btn" id="btn-yes-mine">Yes, it's MINE!</button>
+            <button class="answer-btn" id="btn-no-not-mine">No, it's not.</button>
+        </div>
+
+        <div id="characters-area">
+            <div class="character-spot" id="player-spot">
+                <p>TÚ (MINE)</p>
+            </div>
+            <div class="character-spot" id="tom-spot">
+                <p>Tom (HIS)</p>
+            </div>
+            <div class="character-spot" id="sarah-spot">
+                <p>Sarah (HERS)</p>
+            </div>
+            <div class="character-spot" id="shared-spot">
+                <p>Tom & Sarah (THEIRS)</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay de transición entre fases -->
+    <div id="transition-overlay" class="hidden" aria-live="polite" aria-label="Transición de fase">
+        <div class="transition-content">
+            <h2 id="transition-title"></h2>
+            <div class="transition-celebration" id="transition-celebration" aria-hidden="true">🎉</div>
+        </div>
+    </div>
+
+    <div id="phase-3" class="hidden">
+        <h2 class="phase-title">Fase 3: ¡Hora del picnic!</h2>
+
+        <div id="speech-bubble">
+            <p id="speech-text">¡Hora del Picnic!</p>
+        </div>
+        
+        <div id="picnic-area">
+            <div class="picnic-character" id="picnic-tom">Tom</div>
+            <div class="picnic-character" id="picnic-sarah">Sarah</div>
+            <div class="picnic-character" id="picnic-player">TÚ</div>
+        </div>
+
+        <div id="food-tray" class="hidden">
+            <img src="images/grapes.png" class="food-item" data-food="grapes" alt="Grapes">
+            <img src="images/biscuit.png" class="food-item" data-food="biscuit" alt="Biscuit">
+            <img src="images/orange.png" class="food-item" data-food="orange" alt="Orange">
+            <img src="images/drink.png" class="food-item" data-food="drink" alt="Drink">
+            <img src="images/cherries.png" class="food-item" data-food="cherries" alt="Cherries">
+            <img src="images/crisps.png" class="food-item" data-food="crisps" alt="Crisps"> 
+        </div>
+
+        <div id="yes-no-buttons" class="hidden">
+            <button class="answer-btn" id="btn-yes-please">Yes, please</button>
+            <button class="answer-btn" id="btn-no-thanks">No, thank you</button>
+        </div>
+
+        <div id="end-controls" class="hidden">
+            <button id="btn-restart" class="restart-btn">Volver a jugar</button>
+        </div>
+
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

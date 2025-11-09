@@ -1,0 +1,615 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f0f9f0; /* Un verde pálido de explorador */
+}
+
+/* Títulos de fases */
+.phase-title {
+    margin: 8px 0 12px;
+    font-size: 20px;
+    color: #2e5f2e;
+}
+
+/* Overlay de transición */
+#transition-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+#transition-overlay .transition-content {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px 32px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    animation: pop-in 400ms ease-out;
+}
+#transition-title {
+    margin: 0 0 8px;
+    font-size: 26px;
+    color: #2e5f2e;
+}
+.transition-celebration {
+    font-size: 42px;
+    animation: bounce 1s infinite;
+}
+
+@keyframes pop-in {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Controles de fin y botón Reiniciar */
+#end-controls { margin-top: 16px; }
+.restart-btn {
+    background: #2e5f2e;
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+.restart-btn:hover { background: #397a39; }
+
+/* El contenedor principal del juego */
+#game-area {
+    width: 90%;
+    max-width: 800px;
+    height: 500px;
+    margin: 20px auto;
+    border: 3px dashed #8b4513; /* Borde de "mapa del tesoro" */
+    background: #ffffff;
+    position: relative; /* ¡Muy importante! Para posicionar los objetos dentro */
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* El objetivo: la silueta de la mochila */
+#backpack-target {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%); /* Centra la mochila */
+    width: 150px;
+    height: 200px;
+    background: #eee;
+    border: 2px dashed #999;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #999;
+}
+
+/* Estilo base para todos los objetos que se pueden recoger */
+.xitem {
+    position: absolute; /* Permite ponerlos en cualquier lugar */
+    width: 80px;
+    height: 60px;
+    background: #add8e6; /* Azul claro (marcador de posición) */
+    border: 2px solid #555;
+    border-radius: 5px;
+    cursor: pointer; /* Cambia el ratón a una "mano" */
+    
+    /* Esta es la animación de "vuelo"! */
+    transition: all 0.8s ease-in-out;
+    
+    /* Para centrar el texto del marcador de posición */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    text-align: center;
+}
+
+.item {
+    position: absolute;
+    width: 80px; /* Tamaño de la imagen */
+    height: 60px; /* Tamaño de la imagen */
+    cursor: pointer;
+    transition: all 0.8s ease-in-out;
+    
+    /* ¡Muy importante! Evita que la imagen se estire */
+    object-fit: contain; 
+    
+    /* Añadimos un borde (opcional) */
+    border: 2px solid transparent; 
+    border-radius: 5px;
+}
+.item:hover {
+    border: 2px solid #007bff; /* Resaltado al pasar el ratón */
+}
+
+/* Esta clase se añade con JavaScript cuando encontramos un objeto */
+.item.found {
+    /* Clase legacy, ya no fija posición. Se mantiene por compatibilidad. */
+}
+
+/* Nueva clase para desvanecer y encoger al llegar a la mochila */
+.item.fade-out {
+    opacity: 0;
+    transform: scale(0.1);
+}
+
+/* Mientras se mueve hacia la mochila */
+.item.moving {
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* Esta clase se añade si el jugador se equivoca */
+.item.wrong {
+    /* Animación de "sacudida" */
+    animation: shake 0.4s;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
+
+/* --- Posiciones de los 10 objetos "esparcidos" --- */
+/* --- Posiciones de los 10 objetos "esparcidos" --- */
+/* ¡Puedes cambiar estos valores para moverlos a donde quieras! */
+#cap { top: 30px; left: 50px; background-color: #ffb6c1; }
+#coat { top: 150px; left: 20px; background-color: #ffe4b5; }
+#guide-book { top: 300px; left: 40px; background-color: #98fb98; }
+#water-bottle { top: 80px; left: 200px; background-color: #e6e6fa; }
+#map { top: 250px; left: 180px; background-color: #fafad2; }
+#sun-cream { top: 400px; left: 150px; background-color: #ffdead; }
+#magnifying-glass { top: 50px; left: 670px; background-color: #f0e68c; } /* <-- CORREGIDO */
+#mobile-phone { top: 150px; left: 640px; background-color: #d3d3d3; } /* <-- CORREGIDO */
+#backpack { top: 280px; left: 690px; background-color: #dda0dd; } /* <-- CORREGIDO */
+#notebook { top: 400px; left: 620px; background-color: #b0e0e6; } /* <-- CORREGIDO */
+
+/* --- ESTILOS FASE 2 (AÑADIR AL FINAL) --- */
+
+/* Clase simple para ocultar y mostrar fases */
+.hidden {
+    display: none !important;
+}
+
+#phase-2 {
+    width: 90%;
+    max-width: 800px;
+    height: 600px; /* Un poco más alta para los personajes */
+    margin: 20px auto;
+    border: 3px dashed #8b4513;
+    background: #fdfdfd;
+    position: relative;
+    padding: 10px;
+    box-sizing: border-box; /* Importante para que el padding no afecte el tamaño */
+}
+
+#phase-2-question {
+    color: #333;
+}
+
+/* Área donde aparece el objeto a identificar */
+#item-display-area {
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Estilo del objeto que se muestra en Fase 2 */
+.xitem-p2 {
+    width: 120px;
+    height: 90px;
+    border: 3px solid #333;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative; /* Para las pistas visuales */
+    transition: all 0.8s ease-in-out;
+}
+
+/* Reemplaza tu .item-p2 existente */
+/* Estilo del OBJETO que se muestra en Fase 2 (Contenedor) */
+.item-p2 {
+    width: 120px;
+    height: 90px;
+    border: 3px solid #333;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex; /* <-- Lo volvemos a añadir */
+    justify-content: center; /* <-- Lo volvemos a añadir */
+    align-items: center; /* <-- Lo volvemos a añadir */
+    position: relative; 
+    transition: all 0.8s ease-in-out;
+    /* Quitamos object-fit: contain; de aquí */
+}
+
+/* --- PISTAS VISUALES (¡Importante!) --- */
+/* Usamos ::after para añadir la "etiqueta" (T, S, etc.) */
+
+/* --- PISTAS VISUALES (Restauradas) --- */
+.cue-his { 
+    background: #e0f7fa; /* <-- Vuelve a añadir el fondo */
+    border-color: #0288d1;
+}
+.cue-his::after {
+    content: 'T';
+    position: absolute; top: 2px; right: 5px; font-size: 18px; color: #0288d1;
+}
+
+.cue-hers { 
+    background: #fce4ec; /* <-- Vuelve a añadir el fondo */
+    border-color: #d81b60;
+}
+.cue-hers::after {
+    content: 'S';
+    position: absolute; top: 2px; right: 5px; font-size: 18px; color: #d81b60;
+}
+
+.cue-mine { 
+    background: #fff9c4; /* <-- Vuelve a añadir el fondo */
+    border-color: #fbc02d;
+}
+.cue-mine::after {
+    content: '⭐'; 
+    position: absolute; top: 2px; right: 5px; font-size: 18px;
+}
+
+.cue-theirs { 
+    background: #e8f5e9; /* <-- Vuelve a añadir el fondo */
+    border-color: #43a047;
+}
+.cue-theirs::after {
+    content: 'T+S';
+    position: absolute; top: 2px; right: 5px; font-size: 14px; color: #43a047;
+}
+
+
+/* --- Botones de Respuesta --- */
+#answer-buttons, #yours-buttons {
+    margin-bottom: 30px;
+}
+
+.answer-btn {
+    font-size: 18px;
+    padding: 10px 20px;
+    margin: 5px;
+    cursor: pointer;
+    border: 2px solid #555;
+    border-radius: 5px;
+    background: #f0f0f0;
+}
+.answer-btn:hover {
+    background: #ddd;
+}
+.answer-btn.wrong-shake { /* Animación de sacudida para botón incorrecto */
+    animation: shake 0.4s;
+}
+
+
+/* --- Área de Personajes --- */
+#characters-area {
+    display: flex;
+    justify-content: space-around;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.character-spot {
+    width: 150px;
+    height: 150px;
+    border: 2px dashed #aaa;
+    border-radius: 10px;
+    background: #fafafa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #333;
+    font-weight: bold;
+    text-align: center;
+    position: relative; /* Para colocar insignias (::after) */
+}
+.character-spot p { margin: 0; }
+
+/* Colores que coinciden con las pistas de los objetos en Fase 2 */
+#tom-spot {
+    border-color: #0288d1;
+    background: #e0f7fa;
+    color: #0288d1;
+    box-shadow: 0 0 0 3px rgba(2,136,209,0.12) inset;
+}
+#tom-spot::after {
+    content: 'T';
+    position: absolute; top: 6px; right: 8px; font-size: 20px; color: #0288d1; font-weight: 800;
+}
+
+#sarah-spot {
+    border-color: #d81b60;
+    background: #fce4ec;
+    color: #d81b60;
+    box-shadow: 0 0 0 3px rgba(216,27,96,0.12) inset;
+}
+#sarah-spot::after {
+    content: 'S';
+    position: absolute; top: 6px; right: 8px; font-size: 20px; color: #d81b60; font-weight: 800;
+}
+
+#player-spot {
+    border-color: #fbc02d;
+    background: #fff9c4;
+    color: #b28900; /* contraste sobre amarillo */
+    box-shadow: 0 0 0 3px rgba(251,192,45,0.2) inset;
+}
+#player-spot::after {
+    content: '★';
+    position: absolute; top: 6px; right: 8px; font-size: 20px; color: #f7b500; font-weight: 800;
+}
+
+#shared-spot {
+    border-color: #43a047;
+    background: #e8f5e9;
+    color: #2e7d32;
+    box-shadow: 0 0 0 3px rgba(67,160,71,0.12) inset;
+}
+#shared-spot::after {
+    content: 'T+S';
+    position: absolute; top: 6px; right: 8px; font-size: 16px; color: #2e7d32; font-weight: 800;
+}
+
+/* --- Animaciones de "Vuelo" Fase 2 --- */
+/* Clases que añadiremos con JS para animar el objeto hacia el personaje */
+.item-p2.fly-to-player {
+    transform: translate(-280px, 200px) scale(0.1);
+    opacity: 0;
+}
+.item-p2.fly-to-tom {
+    transform: translate(-100px, 200px) scale(0.1);
+    opacity: 0;
+}
+.item-p2.fly-to-sarah {
+    transform: translate(100px, 200px) scale(0.1);
+    opacity: 0;
+}
+.item-p2.fly-to-theirs {
+    transform: translate(280px, 200px) scale(0.1);
+    opacity: 0;
+}
+
+/* NUEVA REGLA: Estilo para la imagen DENTRO del contenedor */
+.item-p2 img {
+    width: 90%; /* Un poco más pequeña que el marco */
+    height: 90%; /* Un poco más pequeña que el marco */
+    object-fit: contain; /* Para que la imagen no se estire */
+}
+
+/* --- ESTILOS FASE 3 (AÑADIR AL FINAL) --- */
+
+#phase-3 {
+    width: 90%;
+    max-width: 800px;
+    height: 600px;
+    margin: 20px auto;
+    border: 3px dashed #4CAF50; /* Borde verde picnic */
+    background: #f1f8e9; /* Verde muy claro */
+    position: relative;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* La burbuja de diálogo */
+#speech-bubble {
+    width: 80%;
+    min-height: 100px;
+    background: #fff;
+    border: 3px solid #ccc;
+    border-radius: 20px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 16px;
+    position: relative;
+}
+/* Posiciones del globo según el emisor */
+#speech-bubble.from-tom { align-self: flex-start; margin-left: 60px; }
+#speech-bubble.from-sarah { align-self: flex-end; margin-right: 60px; }
+#speech-bubble.from-player { align-self: center; margin-left: 0; margin-right: 0; }
+/* El "triángulo" de la burbuja de diálogo */
+/* Cola por defecto (Tom) */
+#speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 100px;
+    border-width: 20px 20px 0 0;
+    border-style: solid;
+    border-color: #fff transparent transparent transparent;
+    filter: drop-shadow(0 2px 1px rgba(0,0,0,0.2));
+}
+/* Cola cuando habla Sarah: invertida al lado derecho */
+#speech-bubble.from-sarah::after {
+    left: auto;
+    right: 100px;
+    border-width: 20px 0 0 20px;
+    border-color: #fff transparent transparent transparent;
+}
+/* Cola centrada cuando habla el jugador */
+#speech-bubble.from-player::after {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    border-width: 20px 20px 0 20px;
+    border-style: solid;
+    border-color: #fff transparent transparent transparent;
+}
+#speech-text {
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+}
+/* Contenido con imagen dentro del globo */
+#speech-text .speech-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+#speech-text img.speech-food {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    vertical-align: middle;
+}
+
+/* El área del picnic (con posicionamiento relativo) */
+#picnic-area {
+    width: 100%;
+    height: 300px; /* Un poco más de espacio */
+    background: #ffcdd2; /* Color de la manta */
+    border: 2px dashed #e57373;
+    border-radius: 10px;
+    padding: 20px;
+    box-sizing: border-box;
+    position: relative; /* ¡Muy importante para posicionar a los personajes! */
+}
+
+/* Estilo base para los personajes (con posicionamiento absoluto) */
+.picnic-character {
+    width: 150px;
+    height: 150px; /* Los hacemos un poco más bajos */
+    background: #fff;
+    border: 3px solid #aaa;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: #555;
+    position: absolute; /* ¡Posicionamiento absoluto! */
+    cursor: not-allowed; 
+}
+/* Hacemos que se pueda hacer clic en ellos durante la Parte B */
+.picnic-character.clickable {
+    cursor: pointer;
+    border-color: #4CAF50;
+    background: #e8f5e9;
+}
+.picnic-character.clickable:hover {
+    transform: scale(1.05);
+}
+
+/* Bandeja de comida (Parte B) */
+#food-tray {
+    margin-top: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+}
+
+.xxfood-item {
+    width: 100px;
+    height: 70px;
+    background: #fffde7;
+    border: 2px solid #fbc02d;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.food-item {
+    width: 100px;
+    height: 70px;
+    border: 2px solid #fbc02d;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    object-fit: contain; /* ¡Importante! */
+}
+
+.food-item:hover {
+    transform: scale(1.1);
+}
+/* Estilo para la comida seleccionada */
+.food-item.selected {
+    background: #fbc02d;
+    color: #fff;
+    transform: scale(1.1);
+}
+/* Estilo para la comida ya usada */
+.food-item.used {
+    background: #eee;
+    border-color: #ccc;
+    color: #aaa;
+    cursor: not-allowed;
+}
+
+/* Botones Sí/No (Parte A) */
+#yes-no-buttons {
+    margin-top: 40px;
+}
+
+/* --- NUEVAS REGLAS de posición para personajes de picnic --- */
+#picnic-tom {
+    top: 20px;
+    left: 80px;
+}
+#picnic-sarah {
+    top: 20px;
+    right: 80px;
+}
+#picnic-player {
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%); /* Centrado abajo */
+    border-style: dashed; /* Para que "TÚ" se vea diferente */
+    border-color: #007bff;
+}
+
+/* (Esta regla es de antes, pero asegúrate de que esté) */
+/* Hacemos que Tom y Sarah sean clicables en Parte B */
+.picnic-character.clickable {
+    cursor: pointer;
+    border-color: #4CAF50;
+    background: #e8f5e9;
+}
+.picnic-character.clickable:hover {
+    transform: scale(1.05);
+}
+/* Indica que estamos esperando la respuesta de ese amigo */
+.picnic-character.awaiting-response {
+    animation: pulse-glow 1s ease-in-out infinite;
+    box-shadow: 0 0 0 3px rgba(76,175,80,0.25) inset, 0 0 12px rgba(76,175,80,0.35);
+}
+@keyframes pulse-glow {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
