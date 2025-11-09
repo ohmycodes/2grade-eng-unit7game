@@ -60,17 +60,32 @@ body {
 }
 .restart-btn:hover { background: #397a39; }
 
-/* El contenedor principal del juego */
-#game-area {
-    width: 90%;
-    max-width: 800px;
-    height: 500px;
+/* Contenedor responsivo del juego (envuelve al área fija 800x500) */
+#game-wrapper {
+    width: 100%;
+    max-width: 100%;
     margin: 20px auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    position: relative;
+    /* Permitimos scroll horizontal solo si el escalado se clampa (móviles muy pequeños) */
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    touch-action: manipulation;
+}
+
+/* El área lógica del juego (base 800x500, se escala dentro del wrapper) */
+#game-area {
+    width: 800px;   /* Base fija para lógica y posiciones */
+    height: 500px;  /* Base fija para lógica y posiciones */
     border: 3px dashed #8b4513; /* Borde de "mapa del tesoro" */
     background: #ffffff;
     position: relative; /* ¡Muy importante! Para posicionar los objetos dentro */
     user-select: none;
     -webkit-user-select: none;
+    transform-origin: top center; /* Necesario para escalado responsivo */
 }
 
 /* El objetivo: la silueta de la mochila */
@@ -612,4 +627,41 @@ body {
   0% { transform: scale(1); }
   50% { transform: scale(1.03); }
   100% { transform: scale(1); }
+}
+/* Responsive tweaks for mobile and tablets */
+@media (max-width: 1024px) {
+  body { font-size: 16px; }
+  .phase-title { font-size: 18px; }
+  #phase-2, #phase-3 { width: 94%; max-width: 940px; }
+  .answer-btn { font-size: 16px; padding: 10px 14px; }
+}
+
+@media (max-width: 840px) {
+  h1 { font-size: 22px; margin: 10px 0; }
+  #instruction-text { font-size: 18px; }
+  #phase-2, #phase-3 { width: 96%; height: auto; padding: 12px; }
+  #characters-area { position: static; flex-wrap: wrap; gap: 10px; padding: 0; margin-top: 10px; }
+  .character-spot { width: 45%; max-width: 220px; height: 120px; margin: 0 auto; }
+  #item-display-area { height: 120px; }
+  .item-p2 { width: 100px; height: 75px; }
+  #speech-bubble { width: 100%; min-height: 80px; }
+  #speech-text { font-size: 18px; }
+  #picnic-area { height: 240px; }
+  .picnic-character { width: 120px; height: 120px; }
+  #food-tray { gap: 8px; }
+}
+
+@media (max-width: 480px) {
+  body { -webkit-tap-highlight-color: rgba(0,0,0,0); }
+  h1 { font-size: 20px; }
+  .phase-title { font-size: 16px; }
+  #instruction-text { font-size: 16px; }
+  #game-wrapper { margin: 12px auto; }
+  #phase-2, #phase-3 { border-width: 2px; padding: 10px; }
+  .answer-btn { font-size: 15px; padding: 10px 12px; margin: 4px; }
+  .character-spot { width: 48%; height: 110px; }
+  #speech-text { font-size: 16px; }
+  #picnic-area { height: 200px; padding: 12px; }
+  .picnic-character { width: 100px; height: 100px; border-radius: 12px; }
+  #food-tray img.food-item { width: 44px; height: 44px; }
 }
