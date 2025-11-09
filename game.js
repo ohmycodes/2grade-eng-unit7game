@@ -29,6 +29,54 @@ const backpackTarget = document.getElementById("backpack-target");
 
 // --- 2. Funciones del Juego ---
 
+// Escalado responsivo del área de juego (Fase 1)
+let GAME_BASE_WIDTH = 800;
+let GAME_BASE_HEIGHT = 500;
+let gameScale = 1;
+
+function computeGameScale() {
+    try {
+        const wrapper = document.getElementById('game-wrapper');
+        const vw = window.innerWidth || document.documentElement.clientWidth;
+        const vh = window.innerHeight || document.documentElement.clientHeight;
+        // Altura aproximada ocupada por títulos y textos en Fase 1
+        const headerReserve = 220; // ajustable si fuera necesario
+        const availableH = Math.max(320, vh - headerReserve);
+        const scaleW = Math.min(1, (wrapper ? wrapper.clientWidth : vw) / GAME_BASE_WIDTH);
+        const scaleH = Math.min(1, availableH / GAME_BASE_HEIGHT);
+        const s = Math.min(scaleW, scaleH);
+        const clamped = Math.max(0.8, s); // No reducir por debajo de 0.8 para mantener targets táctiles
+        return isFinite(clamped) && clamped > 0 ? clamped : 1;
+    } catch { return 1; }
+}
+
+function applyGameScale() {
+    const area = document.getElementById('game-area');
+    const wrapper = document.getElementById('game-wrapper');
+    gameScale = computeGameScale();
+    if (area) {
+        area.style.transformOrigin = 'top center';
+        area.style.transform = `scale(${gameScale})`;
+    }
+    if (wrapper) {
+        // Ajusta la altura del wrapper para evitar solapamientos/scrolles raros
+        wrapper.style.height = `${(GAME_BASE_HEIGHT * gameScale) + 6}px`; // + borde
+    }
+    // Exponer como variable CSS por si se quiere usar en estilos
+    document.documentElement.style.setProperty('--game-scale', String(gameScale));
+}
+
+function setupResponsiveScaling() {
+    applyGameScale();
+    let resizeTimer;
+    const onResize = () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(applyGameScale, 100);
+    };
+    window.addEventListener('resize', onResize);
+    window.addEventListener('orientationchange', onResize);
+}
+
 // Overlay de transición entre fases
 const transitionOverlay = document.getElementById('transition-overlay');
 const transitionTitleEl = document.getElementById('transition-title');
@@ -72,13 +120,16 @@ function moveItemToBackpackAndFade(item, done) {
         const targetRect = backpackTarget.getBoundingClientRect();
         const itemRect = item.getBoundingClientRect();
 
-        // Centro de la mochila relativo al game-area
-        const targetCenterX = (targetRect.left - areaRect.left) + (targetRect.width / 2);
-        const targetCenterY = (targetRect.top - areaRect.top) + (targetRect.height / 2);
+        // Cálculos en coordenadas de viewport; convertir a coordenadas no escaladas del game-area
+        const scale = (typeof gameScale === 'number' && gameScale > 0) ? gameScale : 1;
+        const areaLeft = areaRect.left;
+        const areaTop = areaRect.top;
+        const targetCenterX_vp = targetRect.left + (targetRect.width / 2);
+        const targetCenterY_vp = targetRect.top + (targetRect.height / 2);
 
-        // Nueva posición (top/left) para centrar el item en la mochila
-        const newLeft = targetCenterX - (itemRect.width / 2);
-        const newTop = targetCenterY - (itemRect.height / 2);
+        // Nueva posición (top/left) en el sistema de coordenadas del #game-area sin escala
+        const newLeft = ((targetCenterX_vp - areaLeft) - (itemRect.width / 2)) / scale;
+        const newTop = ((targetCenterY_vp - areaTop) - (itemRect.height / 2)) / scale;
 
         // Subir z-index y desactivar puntero durante la animación
         item.classList.add('moving');
@@ -157,6 +208,9 @@ function handleItemClick(event) {
 }
 
 // --- 3. Iniciar el Juego ---
+
+// Configura escalado responsivo para Fase 1
+setupResponsiveScaling();
 
 // Añadimos un "detector de clics" a CADA objeto
 allItems.forEach(item => {
